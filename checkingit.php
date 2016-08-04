@@ -72,7 +72,7 @@ function get_user_from_raw_name($name)
 function git_get_files($link_to_diff)
 {
     $ch = curl_init($link_to_diff);
-    curl_setopt($ch, CURLOPT_USERPWD, 'lokaalnieuwsnet:@pp3ltj3s');
+    curl_setopt($ch, CURLOPT_USERPWD, 'username:password');
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     $response = curl_exec($ch);
     curl_close($ch);
