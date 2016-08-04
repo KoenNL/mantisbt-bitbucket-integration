@@ -15,18 +15,23 @@ if (!isset($json->push->changes)) {
     die("Invalid request.");
 }
 
-// Loop trough them changes
+// Retrieve settings
+$fallback_account = config_get('git_fallback_account');
+$commit_regexp = config_get('git_regexp');
+$commit_template = config_get('git_template');
+
+// Loop trough the changes
 foreach ($json->push->changes as $change) {
     $diff_link = $change->links->diff->href;
     $branch = $change->new->name;
 
     foreach ($change->commits as $commit) {
-        $userid = get_user_from_raw_name($commit->author->raw);
-        if (!$userid) {
-            $userid = get_user_from_raw_name($commit_account);
+        $username = get_user_from_raw_name($commit->author->raw);
+        if (!$username) {
+            $username = $fallback_account;
         }
 
-        if (!auth_attempt_script_login($commit_account)) {
+        if (!auth_attempt_script_login($username)) {
             die('Access denied!');
         }
 
@@ -55,24 +60,39 @@ foreach ($json->push->changes as $change) {
     }
 }
 
+/**
+ * Get closest "username" from any given name string
+ * @param string $name
+ * @return string
+ */
 function get_user_from_raw_name($name)
 {
-    while ($name) {
-        $userid = user_get_id_by_name($name);
-        if ($userid) {
-            return $userid;
-        }
-
-        $name = substr($name, 0, strrpos($name, ' '));
+    $email = substr($name, strpos($name, '<') + 1, -1);
+    $userid = user_get_id_by_email($email);
+    if ($userid) {
+        $user = user_get_row($userid);
+        return $user['username'];
     }
 
-    return 0;
+    $parts = preg_split('~[^\w]+~', $name);
+    foreach ($parts as $part) {
+        $userid = user_get_id_by_name($part);
+        if ($userid) {
+            $user = user_get_row($userid);
+            return $user['username'];
+        }
+    }
+
+    return '';
 }
 
 function git_get_files($link_to_diff)
 {
+    $git_username = config_get('git_username');
+    $git_password = config_get('git_password');
+
     $ch = curl_init($link_to_diff);
-    curl_setopt($ch, CURLOPT_USERPWD, 'username:password');
+    curl_setopt($ch, CURLOPT_USERPWD, $git_username . ':' . $git_password);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     $response = curl_exec($ch);
     curl_close($ch);

@@ -10,3 +10,12 @@ Go to the "Webhooks" section of the repository settings at Bitbucket and add the
 http://mantis.yoursite.com/checkingit.php
 
 Set the "Triggers" option to "Repository Push", so the hook will be called on each time you use the "git push" command
+
+## Testing
+
+When testing or debugging Webhooks, for every sent request navigate to "View Details" > "Show request body" to get the contents of that request.
+Using CURL you can debug / test any given request by pasting the request body into a separate file and using a command like:
+
+```
+curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X POST --data "$(cat requestbody.json)" http://mantis.yoursite.com/checkingit.php
+```
