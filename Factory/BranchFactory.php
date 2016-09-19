@@ -7,7 +7,7 @@ use Factory\RepositoryFactory;
 use Tools\Validator;
 use Exception\InvalidDataException;
 
-class BranchFactory extends DefaultFactory
+class BranchFactory
 {
 
     private static $required_data = array(

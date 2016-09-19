@@ -16,16 +16,13 @@ try {
     $data = file_get_contents("php://input");
     file_put_contents('checkingit.log', $data);
 
-    $json = json_decode($data);
-
 // Load parser
     $loader = new Loader;
-    $loader->setDocumentRoot(__DIR__);
     $parser = $loader->getParser($event);
 
 // Parse request
     $parser->setTemplate($commit_template);
-    $parser->parse($json);
+    $loader->parseEvent($event, $parser, $data);
 } catch (Exception $ex) {
     exit($ex->getMessage());
 }

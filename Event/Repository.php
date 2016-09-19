@@ -1,13 +1,13 @@
 <?php
 
-namespace Event\Repository;
+namespace Event;
 
 use Event\DefaultParser;
 
-class Push extends DefaultParser
+class Repository extends DefaultParser
 {
 
-    public function parse($json)
+    public function parsePush($json)
     {
         // Loop trough the changes
         foreach ($json->push->changes as $change) {
